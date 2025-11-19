@@ -52,6 +52,7 @@ def ChangeDim2(*args):
     selected=_w1.Listbox2.curselection()
     if selected:
         level=selected[0]
+        Pi_support.SetDim(2,level)
     if _debug:
         if selected:
             print(level)
@@ -63,6 +64,7 @@ def ChangeDim3(*args):
     selected=_w1.Listbox3.curselection()
     if selected:
         level=selected[0]
+        Pi_support.SetDim(3,level)
     if _debug:
         if selected:
             print(level)
@@ -74,6 +76,7 @@ def ChangeDim4(*args):
     selected=_w1.Listbox4.curselection()
     if selected:
         level=selected[0]
+        Pi_support.SetDim(4,level)
     if _debug:
         if selected:
             print(level)
@@ -90,7 +93,7 @@ def Lamp1on(*args):
         setLamp=0
         txt='Turn lamp On'
     _w1.TbLampOn1.configure(text=txt)
-
+    Pi_support.SetLamp(1,setLamp)
     if _debug:
         print('ScreenV1_support.Lamp1on')
         for arg in args:
@@ -106,6 +109,7 @@ def Lamp2on(*args):
         setLamp=0
         txt='Turn lamp On'
     _w1.TbLampOn2["text"]=txt
+    Pi_support.SetLamp(2,setLamp)
     if _debug:
         print('ScreenV1_support.Lamp2on')
         for arg in args:
@@ -121,6 +125,7 @@ def Lamp3on(*args):
         setLamp=0
         txt='Turn lamp On'
     _w1.TbLampOn3["text"]=txt
+    Pi_support.SetLamp(3,setLamp)
     if _debug:
         print('ScreenV1_support.Lamp3on')
         for arg in args:
@@ -136,6 +141,7 @@ def Lamp4on(*args):
         setLamp=0
         txt='Turn lamp On'
     _w1.TbLampOn4["text"]=txt
+    Pi_support.SetLamp(4,setLamp)
     if _debug:
         print('ScreenV1_support.Lamp4on')
         for arg in args:
