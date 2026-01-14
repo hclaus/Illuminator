@@ -13,9 +13,9 @@ if _RPpresent:
     uart1 = serial.Serial("/dev/ttyAMA1", baudrate=115200, timeout=0.1)
     uart2 = serial.Serial("/dev/ttyAMA2", baudrate=115200, timeout=0.1)
     uart3 = serial.Serial("/dev/ttyAMA3", baudrate=115200, timeout=0.1)
-    uart4 = serial.Serial("/dev/ttyAMA4", baudrate=115200, timeout=0.1)
+    #uart4 = serial.Serial("/dev/ttyAMA4", baudrate=115200, timeout=0.1)
 
-    uarts = [uart0, uart1, uart2, uart3, uart4]
+    uarts = [uart0, uart1, uart2, uart3]
 
 def SetLamp(lamp,option):
     print("Lamp:", {lamp}, "Option:" ,{str(option)})
@@ -49,3 +49,16 @@ def SendUART(lamp, txt):
    # uarts[lamp].write((txt+'\n').encode('utf-8'))
     sys.stdout.flush()
     
+
+def ReadUART(lamp):
+    if lamp==1:
+        UART='UART1'
+    if lamp==2:
+        UART='UART2'
+    if lamp==3:
+        UART='UART3'
+    if lamp==4:
+        UART='UART4'
+    if _debug:
+        print ('Reading from UART:',{UART})
+   # uarts[lamp].readline()
