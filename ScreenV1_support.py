@@ -33,6 +33,8 @@ def main(*args):
     _w1.TbLampOn2.configure(text=txt)
     _w1.TbLampOn3.configure(text=txt)
     _w1.TbLampOn4.configure(text=txt)
+    Pi_support.SetupUARTReaders()
+    
     root.mainloop()
 
 def ChangeDim1(*args):
