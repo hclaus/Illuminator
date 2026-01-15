@@ -8,7 +8,7 @@ import ScreenV1_support
 _debug=True
 _RPpresent=True
 _postMsg=True
-_Simdevice=False #this doesn't work yet
+_Simdevice=True #this doesn't work yet
 
 import serial
 
@@ -26,11 +26,10 @@ if _RPpresent:
 def make_on_line(name):
     def on_line(line: str):
         print(f"from event: {name}: {line}")
-        ReadUART(int(name), line)
         if _Simdevice:
-            line=line+':OK'
-            SendUART(int(name), line)
-        # put your per-UART logic here
+            line=line+':OK' # simulate board response
+
+        ReadUART(int(name), line)
     return on_line
 
 def reader(uarts: serial.Serial, name: str):
@@ -91,31 +90,20 @@ def SendUART(lamp, txt):
     
 
 def ReadUART(lamp:int,msg:str):
-    # if lamp==1:
-    #     UART='UART1'
-    # if lamp==2:
-    #     UART='UART2'
-    # if lamp==3:
-    #     UART='UART3'
-    # if lamp==4:
-    #     UART='UART4'
-   # msg=uarts[lamp-1].readline()
+    
     if _postMsg:
         PostMsg(lamp,msg)
 
     msgArr=msg.split(':')
-    if msgArr[len(msgArr)-1]=="OK":
-        PostError(lamp, "OK")
+    if len(msgArr)==4:
+        PostError(lamp, msgArr[3])
     if _debug:
         print ('Reading from UART:',msg)
     #if msgArr[0]==b'G':
 
     SetGet(lamp,msgArr)
-    return msg
-    # else:   
-    #     return b'Error'  
-
-    
+    #return msg
+   
     
    # set the screen controls based on UART read
 def SetGet(lamp,msgArr):
