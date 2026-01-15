@@ -7,6 +7,8 @@ import threading
 import ScreenV1_support
 _debug=True
 _RPpresent=True
+_postMsg=True
+_Simdevice=False #this doesn't work yet
 
 import serial
 
@@ -25,6 +27,9 @@ def make_on_line(name):
     def on_line(line: str):
         print(f"from event: {name}: {line}")
         ReadUART(int(name), line)
+        if _Simdevice:
+            line=line+':OK'
+            SendUART(int(name), line)
         # put your per-UART logic here
     return on_line
 
@@ -76,14 +81,7 @@ def SetDim(lamp,option):
     SendUART(lamp,txt)
 
 def SendUART(lamp, txt):
-    # if lamp==1:
-    #     UART='UART1'
-    # if lamp==2:
-    #     UART='UART2'
-    # if lamp==3:
-    #     UART='UART3'
-    # if lamp==4:
-    #     UART='UART4'
+   
     uarts[lamp-1].write((txt+'\n').encode('utf-8'))
 
     if _debug:
@@ -102,8 +100,12 @@ def ReadUART(lamp:int,msg:str):
     # if lamp==4:
     #     UART='UART4'
    # msg=uarts[lamp-1].readline()
+    if _postMsg:
+        PostMsg(lamp,msg)
+
     msgArr=msg.split(':')
-    #if msgArr[len(msgArr)-1]==b"OK":
+    if msgArr[len(msgArr)-1]=="OK":
+        PostError(lamp, "OK")
     if _debug:
         print ('Reading from UART:',msg)
     #if msgArr[0]==b'G':
@@ -121,10 +123,10 @@ def SetGet(lamp,msgArr):
         if _debug:
             print ('Get Lamp Status for Lamp:',{lamp+1},'Status:',{msgArr[2]})
             Lcode=msgArr[2]
-            if Lcode=='1':
-                txt='Turn lamp Off'
-            else:
-                txt='Turn lamp On'
+        if Lcode=='1':
+            txt='Turn lamp Off'
+        else:
+            txt='Turn lamp On'
         match lamp+1:
             case 1:
                 ScreenV1_support._w1.TbLampOn1.configure(text=txt)
@@ -162,5 +164,25 @@ def SetGet(lamp,msgArr):
         if _debug:
             print ('Get Dim Level for Lamp:',{lamp+1},'Level:',{msgArr[2]})       
 
+def PostMsg(lamp,msg):
+    match lamp+1:
+        case 1:
+            ScreenV1_support._w1.StatusvarL11.set(msg)
+        case 2:    
+            ScreenV1_support._w1.StatusvarL21.set(msg)
+        case 3:   
+            ScreenV1_support._w1.StatusvarL31.set(msg)      
+        case 4:   
+            ScreenV1_support._w1.StatusvarL41.set(msg)  
 
-    
+
+def PostError(lamp,err): 
+    match lamp+1:
+        case 1:
+            ScreenV1_support._w1.StatusvarL12.set(err)
+        case 2:    
+            ScreenV1_support._w1.StatusvarL22.set(err)
+        case 3:   
+            ScreenV1_support._w1.StatusvarL32.set(err)      
+        case 4:   
+            ScreenV1_support._w1.StatusvarL42.set(err)     
