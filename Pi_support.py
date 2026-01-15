@@ -1,7 +1,8 @@
+#contain code that deals with RP5 UART communication and related screen updates
 
 import sys
 import ScreenV1_support
-#import ScreenV1 
+import ScreenV1 
 import threading
 
 import ScreenV1_support
@@ -174,3 +175,7 @@ def PostError(lamp,err):
             ScreenV1_support._w1.StatusvarL32.set(err)      
         case 4:   
             ScreenV1_support._w1.StatusvarL42.set(err)     
+
+
+if __name__ == '__main__':
+    ScreenV1.start_up()
