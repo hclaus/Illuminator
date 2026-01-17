@@ -9,18 +9,17 @@ import ScreenV1_support
 _debug=True
 _RPpresent=True
 _postMsg=True
-_Simdevice=True #this doesn't work yet
+_Simdevice=False #this doesn't work yet
 
 import serial
 
 if _RPpresent:
 # adjust to the actual device names you see in /dev
-    uart0 = serial.Serial("/dev/ttyAMA0", baudrate=115200, timeout=0.1)
-    uart1 = serial.Serial("/dev/ttyAMA1", baudrate=115200, timeout=0.1)
-    uart2 = serial.Serial("/dev/ttyAMA2", baudrate=115200, timeout=0.1)
-    uart3 = serial.Serial("/dev/ttyAMA3", baudrate=115200, timeout=0.1)
-    #uart4 = serial.Serial("/dev/ttyAMA4", baudrate=115200, timeout=0.1)
-
+    uart0 = serial.Serial("/dev/ttyAMA0", baudrate=9600, timeout=0.1)
+    uart1 = serial.Serial("/dev/ttyAMA1", baudrate=9600, timeout=0.1)
+    uart2 = serial.Serial("/dev/ttyAMA2", baudrate=9600, timeout=0.1)
+    uart3 = serial.Serial("/dev/ttyAMA3", baudrate=9600, timeout=0.1)
+    #uart4 = serial.Serial("/dev/ttyAMA4", baudrate=9600, timeout=0.1)
     uarts = [uart0, uart1, uart2, uart3]
 
 
@@ -91,7 +90,7 @@ def SendUART(lamp, txt):
     
 
 def ReadUART(lamp:int,msg:str):
-    
+    msg=msg.rstrip('\r\n')
     if _postMsg:
         PostMsg(lamp,msg)
 
