@@ -22,6 +22,13 @@ if _RPpresent:
     #uart4 = serial.Serial("/dev/ttyAMA4", baudrate=9600, timeout=0.1)
     uarts = [uart0, uart1, uart2, uart3]
 
+def UART_checkforLamps():
+    for i in range(4):
+        SendUART(i+1, 'G:L:0')  
+        msg=uarts[i].readline()  # clear any existing data
+        if msg==b'':
+            if _debug:
+                print('No response from Lamp', {i+1})   
 
 def make_on_line(name):
     def on_line(line: str):

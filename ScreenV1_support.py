@@ -151,11 +151,8 @@ def Lamp4on(*args):
         sys.stdout.flush()
 
 def Checkforlamps(*args):
-    if _debug:
-        print('ScreenV1_support.Checkforlamps')
-        for arg in args:
-            print ('    another arg:', arg)
-        sys.stdout.flush()
+    Pi_support.UART_checkforLamps()
+    
 
 if __name__ == '__main__':
     ScreenV1.start_up()
