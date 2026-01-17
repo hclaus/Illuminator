@@ -152,8 +152,34 @@ def Lamp4on(*args):
 
 def Checkforlamps(*args):
     Pi_support.UART_checkforLamps()
-    
 
+def disable_frame_children(parent_frame):
+  """Disables all child widgets within a given frame."""
+  for child in parent_frame.winfo_children():
+    try:
+      # Try configuring the 'state' for standard Tkinter widgets
+      child.configure(state="disabled")
+    except tk.TclError:
+      # Catch error for widgets that use a different method (like ttk widgets)
+      try:
+        # Use the 'state' method for ttk widgets
+        child.state(['disabled'])
+      except tk.TclError:
+        # Ignore widgets that don't support a 'state' change (like other Frames or Labels)
+        pass
+
+def enable_frame_children(parent_frame):
+  """Enables all child widgets within a given frame."""
+  for child in parent_frame.winfo_children():
+    try:
+      child.configure(state="normal")
+    except tk.TclError:
+      try:
+        # Use the 'state' method for ttk widgets
+        child.state(['!disabled']) # Use '!disabled' to set back to normal
+      except tk.TclError:
+        pass
+      
 if __name__ == '__main__':
     ScreenV1.start_up()
 

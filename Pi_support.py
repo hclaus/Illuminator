@@ -29,6 +29,24 @@ def UART_checkforLamps():
         if msg==b'':
             if _debug:
                 print('No response from Lamp', {i+1})   
+            msg='0:L:0:No Lamp found'
+            ReadUART(i, msg)
+            DisableFrame(i+1)
+        else:
+            ReadUART(i, msg.decode(errors="ignore"))    
+
+
+def DisableFrame(lamp):
+    match lamp:
+        case 1:
+            ScreenV1_support.disable_frame_children(ScreenV1_support._w1.TFrame1)
+        case 2:
+            ScreenV1_support.disable_frame_children(ScreenV1_support._w1.TFrame2)
+        case 3:
+            ScreenV1_support.disable_frame_children(ScreenV1_support._w1.TFrame3)       
+        case 4:
+            ScreenV1_support.disable_frame_children(ScreenV1_support._w1.TFrame4)
+
 
 def make_on_line(name):
     def on_line(line: str):
