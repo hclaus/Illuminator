@@ -32,7 +32,7 @@ def main(*args):
     _w1.TbLampOn2.configure(text=txt)
     _w1.TbLampOn3.configure(text=txt)
     _w1.TbLampOn4.configure(text=txt)
-    Pi_support.SetupUARTReaders()
+    #Pi_support.SetupUARTReaders()  #new version don't use UART events
     
     root.mainloop()
 
