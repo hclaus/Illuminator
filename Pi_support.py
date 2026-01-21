@@ -25,7 +25,7 @@ if _RPpresent:
 
 def UART_checkforLamps():
     for i in range(4):
-        msg=SendUART(i+1, 'G:L')  #returns the msg
+        msg=SendUART(i+1, 'S:L:0')  #returns the msg
         #msg=uarts[i].readline()  # clear any existing data
         #ReadUART(i, msg.decode(errors="ignore"))
         #msgArr=msg.split(':')
