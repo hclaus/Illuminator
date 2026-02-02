@@ -5,6 +5,7 @@ import sys
 import ScreenV1_support
 import ScreenV1 
 import threading
+import platform
 
 import ScreenV1_support
 _debug=True
@@ -13,15 +14,56 @@ _postMsg=True
 _Simdevice=False #this doesn't work yet
 
 import serial
+import serial.tools.list_ports
 
-if _RPpresent:
-# adjust to the actual device names you see in /dev
-    uart0 = serial.Serial("/dev/ttyAMA0", baudrate=9600, timeout=1)
-    uart1 = serial.Serial("/dev/ttyAMA1", baudrate=9600, timeout=1)
-    uart2 = serial.Serial("/dev/ttyAMA2", baudrate=9600, timeout=1)
-    uart3 = serial.Serial("/dev/ttyAMA3", baudrate=9600, timeout=1)
-    #uart4 = serial.Serial("/dev/ttyAMA4", baudrate=9600, timeout=0.1)
-    uarts = [uart0, uart1, uart2, uart3]
+def get_uarts():
+    """Returns [uart0, uart1, uart2, uart3] - identical on Linux/Windows"""
+    
+    # Your exact Linux ports for Pi 5
+    linux_ports = ["/dev/ttyAMA0", "/dev/ttyAMA1", "/dev/ttyAMA2", "/dev/ttyAMA3"]
+    
+    # Auto-detect available ports first
+    available_ports = [p.device for p in serial.tools.list_ports.comports()]
+    print("Available ports:", available_ports)
+    
+    if 'linux' in platform.system().lower():
+        # Use your exact Linux logic
+        ports_to_try = linux_ports
+        print("Linux mode - using Pi UARTs")
+    else:
+        # Windows: Take first 4 available COM ports
+        ports_to_try = available_ports[:4]
+        print("Windows mode - using first 4 COM ports")
+
+    uarts=[]
+    for i, port in enumerate(ports_to_try):
+        try:
+            uart = serial.Serial(
+                port, 
+                baudrate=9600, 
+                timeout=1
+            )
+            print(f"uart{i} opened: {port}")
+            uarts.append(uart)
+        except Exception as e:
+            print(f"uart{i} failed {port}: {e}")
+            uarts.append(None)  # Keep array length consistent
+    
+    return uarts
+# if _RPpresent:
+# # adjust to the actual device names you see in /dev
+#     uart0 = serial.Serial("/dev/ttyAMA0", baudrate=9600, timeout=1)
+#     uart1 = serial.Serial("/dev/ttyAMA1", baudrate=9600, timeout=1)
+#     uart2 = serial.Serial("/dev/ttyAMA2", baudrate=9600, timeout=1)
+#     uart3 = serial.Serial("/dev/ttyAMA3", baudrate=9600, timeout=1)
+#     #uart4 = serial.Serial("/dev/ttyAMA4", baudrate=9600, timeout=0.1)
+#     uarts = [uart0, uart1, uart2, uart3]
+
+# main
+uart0, uart1, uart2, uart3 = get_uarts()
+uarts = [uart0, uart1, uart2, uart3]
+# end main
+
 
 def UART_checkforLamps():
     for i in range(4):
@@ -65,43 +107,7 @@ def EnableFrame(lamp):
         case 4:
             ScreenV1_support.enable_frame_children(ScreenV1_support._w1.TFrame4)
 
-# def make_on_line(name):
-#     def on_line(line: str):
-#         print(f"from event: {name}: {line}")
-#         if _Simdevice:
-#             line=line+':OK' # simulate board response
 
-#         ReadUART(int(name), line)
-#     return on_line
-
-# def reader(uarts: serial.Serial, name: str):
-#     buf = b""
-#     on_line = make_on_line(name)
-#     while True:
-#         chunk = uarts.read(1024)
-#         if not chunk:
-#             continue
-#         buf += chunk
-#         while b"\n" in buf:
-#             line, _, buf = buf.partition(b"\n")
-#             on_line(line.decode(errors="ignore"))
-
-# serial_objs = []
-# threads = []
-
-# def SetupUARTReaders():
-
-#     for i, dev in enumerate(uarts):
-#         #ser = serial.Serial(dev, 115200, timeout=0.1)
-#         serial_objs.append(dev)
-#         t = threading.Thread(
-#             target=reader,
-#             args=(dev, f"{i}"),
-#             #args=(dev, f"UART{i}"),
-#             daemon=True,
-#         )
-#         t.start()
-#         threads.append(t)
 
 def SetLamp(lamp,option): #on/off
     print("Lamp:", {lamp}, "Option:" ,{str(option)})
@@ -149,10 +155,7 @@ def ReadUART(lamp:int):
     
     SetGet(lamp,msgArr)
     return msg
-    #if msgArr[0]==b'G':
-
     
-    #return msg
    
     
    # set the screen controls based on UART read
