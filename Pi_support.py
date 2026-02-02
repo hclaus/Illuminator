@@ -15,7 +15,6 @@ _Simdevice=False #this doesn't work yet
 
 import serial
 import serial.tools.list_ports
-
 def get_uarts():
     """Returns [uart0, uart1, uart2, uart3] - identical on Linux/Windows"""
     
@@ -41,9 +40,11 @@ def get_uarts():
             uart = serial.Serial(
                 port, 
                 baudrate=9600, 
-                timeout=1
+                timeout=0.5 #changed from 1 to 0.5 for faster response
+                
             )
-            print(f"uart{i} opened: {port}")
+            if _debug:
+                print(f"uart{i} opened: {port}")
             uarts.append(uart)
         except Exception as e:
             print(f"uart{i} failed {port}: {e}")
@@ -155,10 +156,7 @@ def ReadUART(lamp:int):
     
     SetGet(lamp,msgArr)
     return msg
-    
    
-    
-   # set the screen controls based on UART read
 def SetGet(lamp,msgArr):
     if msgArr[1]=='L':
         if _debug:
