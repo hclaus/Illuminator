@@ -11,9 +11,9 @@ import sys
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
-
-import Pi_support
 import ScreenV1
+import Pi_support
+
 
 _debug = True # False to eliminate debug printing from callback functions.
 
@@ -32,7 +32,7 @@ def main(*args):
     _w1.TbLampOn2.configure(text=txt)
     _w1.TbLampOn3.configure(text=txt)
     _w1.TbLampOn4.configure(text=txt)
-    #Pi_support.SetupUARTReaders()  #new version don't use UART events
+    Pi_support.StartPi()
     
     root.mainloop()
 

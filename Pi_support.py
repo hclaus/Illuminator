@@ -7,7 +7,7 @@ import ScreenV1
 import threading
 import platform
 
-import ScreenV1_support
+#import ScreenV1_support
 _debug=True
 _RPpresent=True
 _postMsg=True
@@ -15,8 +15,11 @@ _Simdevice=False #this doesn't work yet
 
 import serial
 import serial.tools.list_ports
+uarts=[]
+
 def get_uarts():
     """Returns [uart0, uart1, uart2, uart3] - identical on Linux/Windows"""
+    global uarts
     
     # Your exact Linux ports for Pi 5
     linux_ports = ["/dev/ttyAMA0", "/dev/ttyAMA1", "/dev/ttyAMA2", "/dev/ttyAMA3"]
@@ -59,11 +62,27 @@ def get_uarts():
 #     uart3 = serial.Serial("/dev/ttyAMA3", baudrate=9600, timeout=1)
 #     #uart4 = serial.Serial("/dev/ttyAMA4", baudrate=9600, timeout=0.1)
 #     uarts = [uart0, uart1, uart2, uart3]
+#get lamp status
+def GetLampStatus():
+    for i in range(4):
+        msg=SendUART(i+1, 'G:L')  #returns the msg
+        #msg=uarts[i].readline()  # clear any existing data
+        #ReadUART(i, msg.decode(errors="ignore"))
+        #msgArr=msg.split(':')
+        if msg==':::No Lamp found':
+            
+            if _debug:
+                print('No response from Lamp', {i+1})   
+            msg=':::No Lamp found'
+            #ReadUART(i, msg)
+            
+        msg=SendUART(i+1, 'G:D')  #returns the msg
+        if msg==':::No Lamp found':
+        
+            if _debug:
+                print('No response from Lamp', {i+1})   
+        msg=':::No Lamp found'
 
-# main
-uart0, uart1, uart2, uart3 = get_uarts()
-uarts = [uart0, uart1, uart2, uart3]
-# end main
 
 
 def UART_checkforLamps():
@@ -226,6 +245,13 @@ def PostError(lamp,err):
         case 4:   
             ScreenV1_support._w1.StatusvarL42.set(err)     
 
+# main
+def StartPi():
 
+    uart0, uart1, uart2, uart3 = get_uarts()
+    uarts = [uart0, uart1, uart2, uart3]
+
+    GetLampStatus()
+# end main
 if __name__ == '__main__':
     ScreenV1.start_up()
