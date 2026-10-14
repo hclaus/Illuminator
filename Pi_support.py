@@ -72,24 +72,20 @@ def InitUarts(port_list=None, baud=9600, timeout=1, map_single_to_all=False):
     # uarts = [uart0] 
     #, uart1, uart2, uart3]
 
-def UART_checkforLamps():
+def RefreshLampStatus():
     for i in range(4):
-        msg=SendUART(i+1, 'G:L')  #returns the msg
-        #msg=uarts[i].readline()  # clear any existing data
-        #ReadUART(i, msg.decode(errors="ignore"))
-        #msgArr=msg.split(':')
-        if msg==':::No Lamp found':
-            
+        lamp = i + 1
+        msg = SendUART(lamp, 'G:L')  #drives SetGet -> updates TbLampOn*.text
+        if msg == ':::No Lamp found':
             if _debug:
-                print('No response from Lamp', {i+1})   
-            msg=':::No Lamp found'
-            #ReadUART(i, msg)
-            DisableFrame(i+1)
-        else:
-            EnableFrame(i+1)
+                print('No response from Lamp', lamp)
+            DisableFrame(lamp)
+            continue  #skip G:D, nothing listens on this port
+        EnableFrame(lamp)
+        SendUART(lamp, 'G:D')  #drives SetGet -> updates Listbox* selection
 
-        
-                
+def UART_checkforLamps():
+    RefreshLampStatus()
 
 
 def DisableFrame(lamp):
