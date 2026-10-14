@@ -1,4 +1,3 @@
-
 #! /usr/bin/env python3
 #    Nov 18, 2025 08:52:26 AM PST  platfo
 #    Jan 17, 2026 10:17:15 AM PST  platform: Windows NT
@@ -19,6 +18,10 @@ _debug = True # False to eliminate debug printing from callback functions.
 
 def main(*args):
     '''Main entry point for the application.'''
+    Pi_support.InitUarts()
+    # for testing ONLY!
+    
+
     global root
     root = tk.Tk()
     root.protocol( 'WM_DELETE_WINDOW' , root.destroy)
