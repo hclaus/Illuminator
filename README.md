@@ -17,7 +17,8 @@ A Tkinter GUI for controlling a 4-channel OSLUV lamp fixture over serial/UART. T
 - Raspberry Pi 5
     - 4 independent UARTs, one per lamp
     - [RP5 UART hardware notes](https://github.com/user-attachments/files/25348169/RP5.UART.hardware.docx)
--Windows
+
+- Windows
     - needs a USB to 4xUART controller
 ## Serial protocol (summary)
 
