@@ -45,7 +45,7 @@ On startup, `Pi_support.InitUarts()` opens the expected serial ports:
 
 Adjust the port lists in `InitUarts()` to match your hardware. A port that fails to open is left as `None` and that lamp's controls are disabled rather than crashing the app.
 
-Shortly after the window opens, `Pi_support.RefreshLampStatus()` runs (via `root.after`) and queries `G:L` and `G:D` for all 4 lamps, so each lamp's on/off button text and dim-level listbox selection reflect real hardware state at launch rather than defaulting to "off". The same function backs the "check for lamps" button (`UART_checkforLamps`), so it re-syncs status and dim level on demand too. It's called after the widgets are built (not from `InitUarts()`), since it writes directly into `_w1` widgets that don't exist yet at that point.
+Shortly after the window opens, `Pi_support.RefreshLampStatus()` runs (via `root.after`) and queries `G:L` and `G:D` for all 4 lamps, so each lamp's on/off button text and dim-level listbox selection reflect real hardware state at launch rather than defaulting to "off". The same function backs the "check for lamps" button (`UART_checkforLamps`), so it re-syncs status and dim level on demand too. 
 
 ## Notes
 
