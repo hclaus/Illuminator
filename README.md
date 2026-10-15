@@ -38,12 +38,20 @@ See `serial commands OSLUV controller V1.docx` for the full command set.
 python ScreenV1.py
 ```
 
-On startup, `Pi_support.InitUarts()` opens the expected serial ports:
+### Configuring the lamp ports (`Port_List`)
 
-- **Linux (Raspberry Pi):** `/dev/ttyAMA4`, `/dev/ttyAMA1`, `/dev/ttyAMA2`, `/dev/ttyAMA3`
-- **Windows (dev/test):** `COM7`, `COM8`, `COM6`, `COM5`
+On startup, `Pi_support.InitUarts()` reads the serial port for each lamp from a `Port_List` file in the same folder as the running app (next to the `.exe`, or next to `Pi_support.py` when run from source/`.bat`). If that file doesn't exist yet, it's created automatically with a platform-appropriate example:
 
-Adjust the port lists in `InitUarts()` to match your hardware. A port that fails to open is left as `None` and that lamp's controls are disabled rather than crashing the app.
+```
+# Port_List - serial port for each lamp, one per line, in order 1-4
+# Windows example: COM5        Linux example: /dev/ttyAMA1
+COM7
+COM8
+COM6
+COM5
+```
+
+Edit the four port lines to match your actual hardware (e.g. whatever COM ports your USB-to-UART adapter enumerates as) and restart the app — no rebuild needed. Blank lines and lines starting with `#` are ignored. If fewer than 4 ports are listed, the remaining lamp slots are simply left disabled rather than falling back to a default. A port that fails to open is also left as `None`, disabling that lamp's controls instead of crashing the app. `Port_List` is machine-specific and isn't tracked in git.
 
 Shortly after the window opens, `Pi_support.RefreshLampStatus()` runs (via `root.after`) and queries `G:L` and `G:D` for all 4 lamps, so each lamp's on/off button text and dim-level listbox selection reflect real hardware state at launch rather than defaulting to "off". The same function backs the "check for lamps" button (`UART_checkforLamps`), so it re-syncs status and dim level on demand too. 
 

@@ -2,8 +2,9 @@
 
 from gc import enable
 import sys
+import os
 import ScreenV1_support
-import ScreenV1 
+import ScreenV1
 #import threading
 import serial
 import ScreenV1_support
@@ -19,27 +20,66 @@ print("__name__:", __name__)
 _uarts_initialized = False
 uarts = []
 
+PORT_LIST_FILENAME = "Port_List"
+
+def _app_dir():
+    """Folder the exe (or .py/.bat) lives in, so Port_List sits next to it."""
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
+
+def _default_ports():
+    if platform.system() == "Windows":
+        return ["COM7", "COM8", "COM6", "COM5"]
+    return ["/dev/ttyAMA4", "/dev/ttyAMA1", "/dev/ttyAMA2", "/dev/ttyAMA3"]
+
+def _load_port_list():
+    """Read lamp 1-4 ports from Port_List next to the app, creating a default example if missing."""
+    path = os.path.join(_app_dir(), PORT_LIST_FILENAME)
+    defaults = _default_ports()
+
+    if not os.path.exists(path):
+        with open(path, 'w') as f:
+            f.write("# Port_List - serial port for each lamp, one per line, in order 1-4\n")
+            f.write("# Windows example: COM5        Linux example: /dev/ttyAMA1\n")
+            for p in defaults:
+                f.write(p + "\n")
+        if _debug: print("Created default Port_List at", path)
+        return defaults
+
+    ports = []
+    with open(path, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            ports.append(line)
+
+    ports = ports[:4]
+    while len(ports) < 4:
+        ports.append(None)  # lamp slot left unconfigured, stays disabled
+    if _debug: print("Loaded ports from", path, ":", ports)
+    return ports
+
 def InitUarts(port_list=None, baud=9600, timeout=1, map_single_to_all=False):
     """
     Initialize expected UART ports.
-    - If port_list is None, choose sensible defaults per platform.
+    - If port_list is None, read lamps 1-4's ports from the Port_List file (created with
+      platform defaults on first run if it doesn't exist yet).
     - If map_single_to_all True and exactly one port opened, replicate it for 4 lamp indices (testing).
     """
     global uarts, _uarts_initialized, _RPpresent
     if _uarts_initialized:
         return
 
-    # platform-specific defaults
     if port_list is None:
-        if platform.system() == "Windows":
-            # windows test default (adjust as needed)
-            port_list = ["COM7", "COM8", "COM6", "COM5"]
-        else:
-            # typical Linux device names for 4 UARTs (adjust to your hardware)
-            port_list = ["/dev/ttyAMA4", "/dev/ttyAMA1", "/dev/ttyAMA2", "/dev/ttyAMA3"]
+        port_list = _load_port_list()
 
     uarts = []
     for p in port_list:
+        if p is None:
+            uarts.append(None)
+            continue
         try:
             ser = serial.Serial(p, baudrate=baud, timeout=timeout)
             uarts.append(ser)
@@ -56,21 +96,6 @@ def InitUarts(port_list=None, baud=9600, timeout=1, map_single_to_all=False):
 
     _uarts_initialized = True
     _RPpresent = any(x is not None for x in uarts)
-
-# if _RPpresent:
-# # adjust to the actual device names you see in /dev
-#     uart0 = serial.Serial("COM3", baudrate=9600, timeout=1)
-#     # uart1 = serial.Serial("COM3", baudrate=9600, timeout=1)
-#     # uart2 = serial.Serial("COM3", baudrate=9600, timeout=1)
-#     # uart3 = serial.Serial("COM3", baudrate=9600, timeout=1)
-#     #uart4 = serial.Serial("/dev/ttyAMA4", baudrate=9600, timeout=0.1)
-#     # uart0 = serial.Serial("/dev/ttyAMA0", baudrate=9600, timeout=1)
-#     # uart1 = serial.Serial("/dev/ttyAMA1", baudrate=9600, timeout=1)
-#     # uart2 = serial.Serial("/dev/ttyAMA2", baudrate=9600, timeout=1)
-#     # uart3 = serial.Serial("/dev/ttyAMA3", baudrate=9600, timeout=1)
-
-    # uarts = [uart0] 
-    #, uart1, uart2, uart3]
 
 def RefreshLampStatus():
     for i in range(4):
